@@ -1,0 +1,1 @@
+from django.urls import pathfrom . import viewsapp_name = "locations"urlpatterns =[    path("", views.index, name="index"),    path("site", views.site, name ="site"),    path("searchsite", views.searchsite, name ="searchsite"),    ]
