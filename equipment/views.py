@@ -171,7 +171,7 @@ def showimage(request):
    
 def loadEquipment():
     import csv
-
+    contSuccess = 0
     CSV_PATH = 'models.csv'
     print('csv = ',CSV_PATH)
     
@@ -190,7 +190,7 @@ def loadEquipment():
         print(image_file)
         print(status)
         print(last_update)
-        Model.objects.create(description=description, category=category, band=band, vendor=vendor, model=model, comments=comments, image_file=image_file, status=status, last_update=last_update)
+        Model.objects.create(description=description, category=category, band=band, vendor=vendor, model=model, comments=comments, image_file=image_file, status=status, last_update=datetime.datetime.strptime(last_update, '%m/%d/%Y'))
         contSuccess += 1
     print(f'{str(contSuccess)} inserted successfully! ')
  

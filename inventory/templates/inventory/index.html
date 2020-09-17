@@ -193,7 +193,7 @@
 					  <th>Model</th>
 					  <th>S/N</th>
 					  <th>location</th>
-					  <th>Quantity</th>
+					  <th>Shelf</th>
 					  <th>Comments</th>
 					  <th>Active</th>
 					</tr>
@@ -207,7 +207,7 @@
 					<td><a class="nav-link" href="{% url 'inventory:item' %}?inventory_id={{item.id}}">{{item.modelname}}</td>
 					<td><a class="nav-link" href="{% url 'inventory:item' %}?inventory_id={{item.id}}">{{item.serial_number}}</td>
 					<td><a class="nav-link" href="{% url 'inventory:item' %}?inventory_id={{item.id}}">{{item.locationname}}</td>
-					<td><a class="nav-link" href="{% url 'inventory:item' %}?inventory_id={{item.id}}">{{item.quantity}}</td>
+					<td><a class="nav-link" href="{% url 'inventory:item' %}?inventory_id={{item.id}}">{{item.shelf}}</td>
 					<td><a class="nav-link" href="{% url 'inventory:item' %}?inventory_id={{item.id}}">{{item.remarks}}</td>
 					<td><a class="nav-link" href="{% url 'inventory:item' %}?inventory_id={{item.id}}">{{item.active}}</td>
 				</tr>
