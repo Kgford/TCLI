@@ -32,7 +32,7 @@
 				</li>
 				<li class="nav-item active">
 				<span data-feather="bar-chart-2"></span>
-					<a class="nav-link " href="#" aria-disabled="true">  Reports  </a>
+					<a class="nav-link " href="{% url 'inventory:inv_report' %}" aria-disabled="true">  Monthly Report  </a>
 				</li>
 				<li class="nav-item active">
 				<span data-feather="log-out"></span>
@@ -83,10 +83,9 @@
 							{% else %}
 								<option selected>select menu</option>
 							{% endif %}	
-							<option data-desc = 'category', value = "Critical Spares">Critical Spares</option>
-							<option data-desc = 'category', value = "GDC Critical Spares">GDC Critical Spares</option>
-							<option data-desc = 'category', value = "GDC Spares">GDC Spares</option>
-							<option data-desc = 'category', value = "SC-90 Upgrades">SC-90 Upgrades<option>
+							{% for cat in categorys_list %}
+								<option data-desc = 'category', value = "{{cat}}">{{cat}}</option>
+							{% endfor %}
 						</select>
 					</div>
 				</div>	
@@ -101,12 +100,9 @@
 							{% else %}
 								<option selected>select menu</option>
 							{% endif %}	
-							<option data-desc = 'in-house', value = "In-House">In-House</option>
-							<option data-desc = 'in-field', value = "In-Field">In-Field</option>
-							<option data-desc = 'in-test', value = "In-Test">In-Test</option>
-							<option data-desc = 'out-repair', value = "Out-Repair">Out-Repair</option>
-							<option data-desc = 'in-repair', value = "In-Repair">In-Repair</option>
-							<option data-desc = 'failure', value = "Failure">Failure</option>
+							{% for istatus in status_list %}
+								<option data-desc = 'status', value = "{{istatus}}">{{istatus}}</option>
+							{% endfor %}
 						</select>
 					</div>
 				</div>

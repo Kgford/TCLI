@@ -45,6 +45,12 @@
 				  <li class="nav-item">
 					<a class="nav-link" href="{% url 'equipment:equipment' %}">
 					  <span data-feather="file"></span>
+					  Search Equipment
+					</a>
+				  </li>
+				  <li class="nav-item">
+					<a class="nav-link" href="{% url 'equipment:newmodel' %}">
+					  <span data-feather="file"></span>
 					  Add Equipment
 					</a>
 				  </li>
@@ -102,27 +108,27 @@
 					<div class="col-sm-1 col-lg-2 grid-col">
 						<div class="form-group">
 							<label>Category <span class="k-required"></span></label>
-							<select required id='_cat' name = "_cat" class="browser-default custom-select custom-select-lg mb-3" >
+							<select required id='_cat' onchange="this.nextElementSibling.value=this.value" name = "_cat" class="browser-default custom-select custom-select-lg mb-3" >
 								{% if active_inv %}
 									<option selected>{{active_inv.category}}</option>
 								{% else %}
-									<option selected>select menu</option>
+									<option value=""></option>
 								{% endif %}	
-								<option data-desc = 'status', data-val = "Critical Spares">Critical Spares</option>
+								<option data-desc = 'status', value  = "Critical Spares">Critical Spares</option>
 								<option data-desc = 'category', value = "GDC Critical Spares">GDC Critical Spares</option>
-								<option data-desc = 'status', data-val = "GDC Spares">GDC Spares</option>
-								<option data-desc = 'status', data-val = "SC-90 Upgrades">SC-90 Upgrades<option>
+								<option data-desc = 'status', value  = "GDC Spares">GDC Spares</option>
+								<option data-desc = 'status', value  = "SC-90 Upgrades">SC-90 Upgrades<option>
 							</select>
 						</div>
-					</div>
+					</div>`
 					<div class="col-sm-2 col-lg-2 grid-col">
 						<div class="form-group">
 							<label>Status<span class="k-required"></span></label>
-							<select required id='_stat' name = "_stat" class="browser-default custom-select custom-select-lg mb-3" >
+							<select id='_stat' onchange="this.nextElementSibling.value=this.value" name = "_stat" class="browser-default custom-select custom-select-lg mb-3"   required >
 								{% if active_inv %}
 									<option selected>{{active_inv.status}}</option>
 								{% else %}
-									<option selected>select menu</option>
+									<option value=""></option>
 								{% endif %}	
 								<option data-desc = 'in-house', value = "In-House">In-House</option>
 								<option data-desc = 'in-field', value = "In-Field">In-Field</option>
@@ -173,41 +179,6 @@
 							
 						</div>	
 					</div>
-					<div class="col-sm-1 col-lg-2 grid-col">
-						<div class="form-group">
-							<label for="_Qn">Quantity</label>
-							{% if active_inv %}
-								<input value = {{active_inv.quantity}}  id = "_Qn" name = "_Qn" input class="form-control" placeholder="Quantity" required>
-							{% else %}
-								<input id = "_Qn" name = "_Qn" input class="form-control" placeholder="Quantity" required>
-							{% endif %}
-							
-						</div>	
-					</div>
-				</div>
-				<div class="row">
-				   <div class="col-sm-2 col-lg-2 grid-col">
-						<div class="form-group">
-							<label for="_shipped">Shipped Date</label>
-							{% if active_inv %}
-								<input value={{active_inv.shipped_date|date:"Y-m-d"}} id = "_shipped" name = "_shipped" input class="form-control" placeholder="Enter  Date" required>
-							{% else %}
-								<input value={{today|date:"Y-m-d"}} id = "_shipped" name = "_shipped" input class="form-control" placeholder="Enter  Date" required>
-							{% endif %}
-							
-						</div>
-					</div>
-					<div class="col-sm-2 col-lg-2 grid-col">
-						<div class="form-group">
-							<label for="_recieved">Recieved Date</label>
-							{% if active_inv %}
-								<input value={{active_inv.recieved_date|date:"Y-m-d"}} id = "_recieved" name = "_recieved" input class="form-control" placeholder="Enter Date" required>
-							{% else %}
-								<input value={{today|date:"Y-m-d"}} id = "_recieved" name = "_recieved" input class="form-control" placeholder="Enter Date" required>
-							{% endif %}
-							
-						</div>
-					</div>
 					<div class="col-sm-2 col-lg-2 grid-col">
 						<div class="form-group">
 							<label>Active: <span class="k-required"></span></label>
@@ -231,53 +202,26 @@
 								{% if active_inv %}
 									<option selected>{{active_inv.locationname}}</option>
 								{% else %}
-									<option selected>select menu</option>
+									<option value=""></option>
 								{% endif %}	
 								{% for location in locations_list %}
-								<option data-desc = 'location', data-val = "{{locationname}}">{{location}}</option>
-							{% endfor %}
+									<option data-desc = 'location', data-val = "{{locationname}}">{{location}}</option>
+								{% endfor %}
 							</select>
 						</div>
 					</div>
 					<div class="col-sm-2 col-lg-2 grid-col">
 						<div class="form-group">
 							<label>Shelf <span class="k-required"></span></label>
-							<select required id='_shelf' name = "_shelf" class="browser-default custom-select custom-select-lg mb-3" >
+							<select required id='_shelf' onchange="this.nextElementSibling.value=this.value" name = "_shelf" class="browser-default custom-select custom-select-lg mb-3" >
 								{% if active_inv %}
-									<option selected>{{active_inv.shelf}}</option>
+									<option selected value={{active_inv.shelf}} >{{active_inv.shelf}}</option>
 								{% else %}
-									<option selected>select</option>
+									<option value=""></option>
 								{% endif %}	
-								<option data-desc = 'shelf', data-val = "A1">A1</option>
-								<option data-desc = 'shelf', data-val = "A2">A2</option>
-								<option data-desc = 'shelf', data-val = "A3">A3</option>
-								<option data-desc = 'shelf', data-val = "A4">A4</option>
-								<option data-desc = 'shelf', data-val = "A5">A5</option>
-								<option data-desc = 'shelf', data-val = "B1">B1</option>
-								<option data-desc = 'shelf', data-val = "B2">B2</option>
-								<option data-desc = 'shelf', data-val = "B3">B3</option>
-								<option data-desc = 'shelf', data-val = "B4">B4</option>
-								<option data-desc = 'shelf', data-val = "B5">B5</option>
-								<option data-desc = 'shelf', data-val = "C1">C1</option>
-								<option data-desc = 'shelf', data-val = "C2">C2</option>
-								<option data-desc = 'shelf', data-val = "C3">C3</option>
-								<option data-desc = 'shelf', data-val = "C4">C4</option>
-								<option data-desc = 'shelf', data-val = "B5">C5</option>
-								<option data-desc = 'shelf', data-val = "K1">K1</option>
-								<option data-desc = 'shelf', data-val = "K2">K2</option>
-								<option data-desc = 'shelf', data-val = "K3">K3</option>
-								<option data-desc = 'shelf', data-val = "K4">K4</option>
-								<option data-desc = 'shelf', data-val = "K5">K5</option>
-								<option data-desc = 'shelf', data-val = "L1">L1</option>
-								<option data-desc = 'shelf', data-val = "L2">L2</option>
-								<option data-desc = 'shelf', data-val = "L3">L3</option>
-								<option data-desc = 'shelf', data-val = "L4">L4</option>
-								<option data-desc = 'shelf', data-val = "L5">L5</option>
-								<option data-desc = 'shelf', data-val = "H1">H1</option>
-								<option data-desc = 'shelf', data-val = "H2">H2</option>
-								<option data-desc = 'shelf', data-val = "H3">H3</option>
-								<option data-desc = 'shelf', data-val = "H4">H4</option>
-								<option data-desc = 'shelf', data-val = "H">H5</option>
+								{% for ishelf in shelf_list %}
+									<option data-desc = 'shelf', value = "{{ishelf}}">{{ishelf}}</option>
+								{% endfor %}
 							</select>
 						</div>
 					</div>

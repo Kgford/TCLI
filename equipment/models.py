@@ -53,5 +53,5 @@ class Model(models.Model):
             'image_file': self.image_file,
             'status': self.status,
             'last_update': self.last_update,
-            'inventorys_id': self.inventory_id,
+            'inventory_id': self.inventory_id,
         }  

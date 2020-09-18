@@ -40,7 +40,7 @@ class Inventory(models.Model):
         }
         
     def add_event(self, type, date, comment):
-        r = Event(event_type=type,event_date=event_date, operator=operator, comment=comment, locationname=self.locationname,mr=mr, rma=rma, inventorys_id=self.id)
+        r = Event(event_type=type,event_date=event_date, operator=operator, comment=comment, locationname=self.locationname,mr=mr, rma=rma, inventory_id=self.id)
         self.add(r)
         self.commit()
 		
@@ -81,7 +81,7 @@ class Events(models.Model):
     rma = models.CharField("Item Serial number",max_length=20,null=False,unique=False,default='N/A')  
     inventory_id = models.IntegerField(null=True,unique=False)
 	
-    def add_new(self, event_type, event_date,operator, comment, locationname, mr, rma, inventorys_id):
+    def add_new(self, event_type, event_date,operator, comment, locationname, mr, rma, inventory_id):
         self.event_type = event_type
         self.event_date = event_date
         self.operator = operator

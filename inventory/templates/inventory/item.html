@@ -45,6 +45,12 @@
 				  <li class="nav-item">
 					<a class="nav-link" href="{% url 'equipment:equipment' %}">
 					  <span data-feather="file"></span>
+					  Search Equipment
+					</a>
+				  </li>
+				  <li class="nav-item">
+					<a class="nav-link" href="{% url 'equipment:newmodel' %}">
+					  <span data-feather="file"></span>
 					  Add Equipment
 					</a>
 				  </li>
@@ -136,16 +142,21 @@
 					 <div class="form-group">
 						<label>Event Type<span class="k-required"></span></label>
 						<input type='hidden' name='event' data-select='event'/>
-						<select id='_event' name = '_event'  class="browser-default custom-select custom-select-lg mb-3"  >
+						<select id='_event' onchange="this.nextElementSibling.value=this.value" name = '_event' class="browser-default custom-select custom-select-lg mb-3"  >
 							{% if event != 'n/a' %}
 								<option selected>{{event.event_type}}</option>
 							{% else %}
-								<option selected>Enter Type</option>
+								<option value=""></option>
 							{% endif %}	
 							<option data-desc = 'standard', value = "standard">STD</option>
 							<option data-desc = 'RMA', value = "rma">RMA</option>
 							<option data-desc = 'MR', value = "mr">MR</option>
-							<option data-desc = 'Repair', value = "repair">REPAIR</option>
+							<option data-desc = 'Verified', value = "VERIFIED">VERIFIED</option>
+							<option data-desc = 'Returned', value = "RETURNED">RETURNED</option>
+							<option data-desc = 'Shipped', value = "SHIPPED">SHIPPED</option>
+							<option data-desc = 'Missing', value = "MISSING">MISSING</option>
+							<option data-desc = 'Testing', value = "TESTING">TESTING</option>
+							<option data-desc = 'Repair', value = "REPAIR">REPAIR</option>
 							<option data-desc = 'Update', value = "update">UPDATE</option>
 							<option data-desc = 'Remove', value = "remove">REMOVE</option>
 							<option data-desc = 'Failure', value = "failure">FAILURE</option>
