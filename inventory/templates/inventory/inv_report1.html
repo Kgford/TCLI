@@ -55,10 +55,8 @@ img {
  </div>
 <TABLE>
 <COL/><COL span="25" style="text-align: center;" /><TBODY>
+	<TR height="20" width='600'><TD NOWRAP="" class="TTL">TCLI Monthly Inventory Report  </TD></TR>
 	<TR height="20" ><TD NOWRAP="" class="STR0"> Report Date:</TD><TD NOWRAP="" class="STR0"> {{today}}</TD></TR>
-	<TR height="20" width='8600'><TD NOWRAP="" class="TTL">TCLI Monthly Inventory Report  </TD></TR>
-	<TR height="20" ><TD class="HDR"> Category:   {{category}} </TD></TR>
-	
 </TBODY></TABLE>
 
 
@@ -66,24 +64,22 @@ img {
 <TBODY>
 	<BR><TABLE>
 	<TBODY>
-		<TR height="20" ><TD class="TTL"> Inventory Item Summary:</TD></TR>
+		<TR height="20" ><TD class="HDR"> Category:{{category}} </TD></TR>
 	</TBODY></TABLE>
-	{% for model in models_list %}
-		<TR height="20" ><TD NOWRAP="" class="TTL"> Model:  </TD><TD NOWRAP="" class="STR0"> {{model}}</TD></TR>
-		<TR height="20" width='8600' >
-			<TD NOWRAP="" class="STR0"> Total: {{model.total_quan}} </TD>
-			<TD NOWRAP="" class="STR0"> In-House: {{model.house_quan}} </TD>
-			<TD NOWRAP="" class="STR0"> On-Site: {{model.field_quan}} </TD>
-			<TD NOWRAP="" class="STR0"> In-Repair: {{model.repair_quan}} </TD>
-			<TD NOWRAP="" class="STR0"> Missing : {{model.field_quan}} </TD>
+		<TR height="20" ><TD NOWRAP="" class="STR0"> Model:  </TD><TD NOWRAP="" class="STR0"> {{models_list}}</TD></TR>
+		<TR height="10" >
+			<TD NOWRAP="" class="STR0"> Total Quantity: </TD><TD NOWRAP="" class="STR0"> {{curr_quan}} --</TD>
+			<TD NOWRAP="" class="STR0"> On-Site Quantity: </TD><TD NOWRAP="" class="STR0"> {{field_quan}} --</TD>
+			<TD NOWRAP="" class="STR0"> In-Repair Quantity: </TD><TD NOWRAP="" class="STR0"> {{repair_quan}} --</TD>
+			<TD NOWRAP="" class="STR0"> Missing Quantity: </TD><TD NOWRAP="" class="STR0"> {{missing_quan}} </TD>
 		</TR>
-    {% endfor %}
+
 </TBODY></TABLE>		
 				
 
 <BR><TABLE>
 <TBODY>
-<TR  height="20" width='8600'><TD class="HDR"> Inventory Items List </TD></TR>
+<TR height="20" ><TD class="HDR"> Inventory Summary </TD></TR>
 	<TR height="20" ><TD NOWRAP="True" class="SHR"> Category </TD><TD NOWRAP="True" class="SHR"> Status </TD><TD NOWRAP="True"  class="SHR"> Description </TD><TD NOWRAP="True"  class="SHR"> location </TD><TD class="SHR"> Operator </TD><TD NOWRAP="True" class="SHR"> Model </TD><TD NOWRAP="True"  class="SHR"> S/N </TD></TR>
 	{% for item in inv_list %}
 		<TR height="20" ><TD NOWRAP="True" class="STR0"> {{item.category}} </TD><TD NOWRAP="True" class="STR0"> {{item.status}}</TD><TD NOWRAP="" class="STR0"> {{item.description}} </TD><TD NOWRAP="" class="STR0"> {{item.locationname}}</TD><TD NOWRAP="" class="STR0"> {{item.operator}} </TD><TD NOWRAP="" class="STR0"> {{item.model}} </TD><TD NOWRAP="" class="STR0"> {{item.serial_number}} </TD></TR>

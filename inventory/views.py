@@ -1,4 +1,5 @@
 from django import forms
+import json
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
@@ -139,7 +140,11 @@ class InventoryView(View):
             print('select =',select)
             search = request.POST.get('search', -1)
             print('search =',search)
+            print_report = request.POST.get('monthly_report', -1)
+            print('print_report =',print_report)
             success = True
+            
+            
 
             desc_list = Inventory.objects.order_by('description').values_list('description', flat=True).distinct()
             models_list = Inventory.objects.order_by('modelname').values_list('modelname', flat=True).distinct()
@@ -151,91 +156,88 @@ class InventoryView(View):
                 inv_list = Inventory.objects.filter(description__icontains=search) | Inventory.objects.filter(modelname__icontains=search) | Inventory.objects.filter(status__icontains=search) | Inventory.objects.filter(category__icontains=search) | Inventory.objects.filter(locationname__icontains=search) | Inventory.objects.filter(serial_number__contains=search) | Inventory.objects.filter(shelf__icontains=search).all()
             elif description == "select menu" and model == "select menu" and status == "select menu" and category == "select menu" and locationname == "select menu" and  shelf == "select":
                 inv_list = Inventory.objects.all()
-            elif not description =="select menu": 
-                print('description selected')
-                if model == "select menu" and status == "select menu" and category == "select menu" and locationname == "select menu" and  shelf == "select": #All
-                    inv_list = Inventory.objects.filter(description__contains=description).all()
-                if not model == "select menu" and status == "select menu" and category == "select menu" and locationname == "select menu" and  shelf == "select":  #description, model 
-                    inv_list = Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(modelname__contains=model).all()  
-                if model == "select menu" and not status == "select menu" and category == "select menu" and locationname == "select menu" and  shelf == "select":  #description&status 
-                    inv_list = Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(status__contains=status).all()  
-                if not model == "select menu" and not status == "select menu" and category == "select menu" and locationname == "select menu" and  shelf == "select":  #description& model &  status 
-                    inv_list = Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(status__contains=status).all()  
-                if not model == "select menu" and not status == "select menu" and not category == "select menu" and locationname == "select menu" and  shelf == "select": #description &  model, status, cat
-                    inv_list = Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(status__contains=status) & Inventory.objects.filter(category__contains=category).all() 
-                if not model == "select menu" and not status == "select menu" and not category == "select menu" and not locationname == "select menu" and  shelf == "select": #description, model, status, cat' loc
-                    inv_list = Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(status__contains=status) & Inventory.objects.filter(category__contains=category) & Inventory.objects.filter(locationname__contains=locationname).all() 
-                if not model == "select menu" and not status == "select menu" and not category == "select menu" and not locationname == "select menu" and not shelf == "select": #description &  model &  status &  cat' loc &  shelf
-                    inv_list = Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(status__contains=status) & Inventory.objects.filter(category__contains=category) & Inventory.objects.filter(locationname__contains=locationname) & Inventory.objects.filter(shelf__contains=shelf).all()     
+            elif not category =="select menu": 
+                if description == "select menu" and model == "select menu" and status == "select menu" and locationname == "select menu" and  shelf == "select":#category only 
+                    inv_list = Inventory.objects.filter(category=category).all()
+                if not model == "select menu" and status == "select menu" and locationname == "select menu" and  shelf == "select":  #category &  model
+                    inv_list = Inventory.objects.filter(category=category, modelname__contains=model).all()  
+                if not model == "select menu" and not status == "select menu" and locationname == "select menu" and  shelf == "select":  #category & status & model & description
+                    inv_list = Inventory.objects.filter(category=category, modelname__contains=model, status__contains=status).all()  
+                if not model == "select menu" and not status == "select menu" and not locationname == "select menu" and  shelf == "select": #category & status & model & description
+                    inv_list = Inventory.objects.filter(category=category, modelname__contains=model, status__contains=status, locationname__contains=locationname).all() 
+                if not model == "select menu" and not status == "select menu" and not locationname == "select menu" and not shelf == "select": #category & status & model & description &  cat
+                    iinv_list = Inventory.objects.filter(category=category, modelname__contains=model, status__contains=status, locationname__contains=locationname, shelf__contains=shelf).all() 
+                if not model == "select menu" and not status == "select menu" and not locationname == "select menu" and not shelf == "select" and not description  == "select menu" : #category & status & model & description &  cat
+                    iinv_list = Inventory.objects.filter(category=category, modelname__contains=model, status__contains=status, locationname__contains=locationname, shelf__contains=shelf, description__icontains=description).all() 
             elif not model =="select menu": 
-                if description == "select menu" and status == "select menu" and category == "select menu" and locationname == "select menu" and  shelf == "select":#model only 
+                if description == "select menu" and status == "select menu" and category == "select menu" and locationname == "select menu" and shelf == "select":#model only 
                     inv_list = Inventory.objects.filter(modelname__contains=model).all()
-                if not description == "select menu" and status == "select menu" and category == "select menu" and locationname == "select menu" and  shelf == "select":  #model & description 
-                    inv_list = Inventory.objects.filter(modelname__icontains=model) & Inventory.objects.filter(description__icontains=description).all()  
-                if not description == "select menu" and not status == "select menu" and category == "select menu" and locationname == "select menu" and  shelf == "select":  #model & description &  status 
-                    inv_list = Inventory.objects.filter(modelname__icontains=model) & Inventory.objects.filter(description__icontains=description) & Inventory.objects.filter(status__contains=status).all()  
-                if not description == "select menu" and not status == "select menu" and category == "select menu" and locationname == "select menu" and  shelf == "select":    #model &  status 
-                    inv_list = Inventory.objects.filter(modelname__icontains=model) & Inventory.objects.filter(description__icontains=description) & Inventory.objects.filter(status__contains=status).all()  
-                if not description == "select menu" and not status == "select menu" and not category == "select menu" and locationname == "select menu" and  shelf == "select": #model & description &   status &  cat
-                    inv_list = Inventory.objects.filter(modelname__icontains=model) & Inventory.objects.filter(description__icontains=description) & Inventory.objects.filter(status__contains=status) & Inventory.objects.filter(category__contains=category).all() 
-                if not description == "select menu" and not status == "select menu" and not category == "select menu" and not locationname == "select menu" and  shelf == "select": #model & description &  status &  cat' loc
-                    inv_list = Inventory.objects.filter(dmodelname__icontains=model) & Inventory.objects.filter(description__icontains=description) & Inventory.objects.filter(status__contains=status) & Inventory.objects.filter(category__contains=category) & Inventory.objects.filter(locationname__contains=locationname).all() 
-                if not description == "select menu" and not status == "select menu" and not category == "select menu" and not locationname == "select menu" and not shelf == "select": #model & description &  status &  cat' loc &  shelf
-                    inv_list = Inventory.objects.filter(modelname__icontains=model) & Inventory.objects.filter(description__icontains=description) & Inventory.objects.filter(status__contains=status) & Inventory.objects.filter(category__contains=category) & Inventory.objects.filter(locationname__contains=locationname) & Inventory.objects.filter(shelf__contains=shelf).all()     
+                if not category == "select menu" and status == "select menu" and description  == "select menu" and locationname == "select menu" and shelf == "select":  #model & description 
+                    inv_list = Inventory.objects.filter(modelname__icontains=model, category_icontains=category ).all()  
+                if not category == "select menu" and not status == "select menu" and description  == "select menu" and locationname == "select menu" and shelf == "select":  #model & description &  status 
+                    inv_list = Inventory.objects.filter(modelname__icontains=model,category=category, status__contains=status).all()  
+                if not category == "select menu" and not status == "select menu" and not description  == "select menu" and locationname == "select menu" and shelf == "select":    #model &  status 
+                    inv_list = Inventory.objects.filter(modelname__icontains=model,category=category, status__contains=status, description__icontains=description).all()  
+                if not category == "select menu" and not status == "select menu" and not description  == "select menu" and not locationname == "select menu" and shelf == "select": #model & description &   status &  cat
+                    inv_list = Inventory.objects.filter(modelname__icontains=model,category=category, status__contains=status,description__icontains=description,locationname__icontains=locationname).all()  
+                if not category == "select menu" and not status == "select menu" and not description  == "select menu" and not locationname == "select menu" and shelf == "select": #model & description &  status &  cat' loc
+                    inv_list = Inventory.objects.filter(dmodelname__icontains=model,category=category, status__contains=status, description__icontains=description,locationname__icontains=locationname).all() 
+                if not category == "select menu" and not status == "select menu" and not description  == "select menu" and not locationname == "select menu" and not shelf == "select": #model & description &  status &  cat' loc &  shelf
+                    inv_list = Inventory.objects.filter(modelname__icontains=model,category_icontains=category, status__contains=status, description__icontains=description, locationname__icontains=locationname, shelf__contains=shelf).all()     
             elif not status =="select menu": 
                 if description == "select menu" and model == "select menu" and category == "select menu" and locationname == "select menu" and  shelf == "select":#status only 
                     inv_list = Inventory.objects.filter(status__contains=status).all()
                 if not model == "select menu" and not status == "select menu" and category == "select menu" and locationname == "select menu" and  shelf == "select":  #status &  model
-                    inv_list = Inventory.objects.filter(status__contains=status) & Inventory.objects.filter(modelname__contains=model).all()  
-                if not model == "select menu" and not status == "select menu" and category == "select menu" and locationname == "select menu" and  shelf == "select":  #status & description
-                    inv_list = Inventory.objects.filter(status__contains=status) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(description__contains=description).all()      
-                if not model == "select menu" and not status == "select menu" and category == "select menu" and locationname == "select menu" and  shelf == "select":  #status & model & description
-                    inv_list = Inventory.objects.filter(status__contains=status) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(description__contains=description).all()  
-                if not model == "select menu" and not status == "select menu" and not category == "select menu" and locationname == "select menu" and  shelf == "select": #status & model & description &  cat
-                    inv_list = Inventory.objects.filter(status__contains=status) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(category__contains=category).all() 
-                if not model == "select menu" and not status == "select menu" and not category == "select menu" and not locationname == "select menu" and  shelf == "select": #status & model & description &  cat' loc
-                    inv_list = Inventory.objects.filter(status__contains=status) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(category__contains=category) & Inventory.objects.filter(locationname__contains=locationname).all() 
-                if not model == "select menu" and not status == "select menu" and not category == "select menu" and not locationname == "select menu" and not shelf == "select": #status &  model & description &  cat' loc &  shelf
-                    inv_list = Inventory.objects.filter(status__contains=status) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(category__contains=category) & Inventory.objects.filter(locationname__contains=locationname) & Inventory.objects.filter(shelf__contains=shelf).all()     
-            elif not category =="select menu": 
-                if description == "select menu" and model == "select menu" and status == "select menu" and locationname == "select menu" and  shelf == "select":#category only 
-                    inv_list = Inventory.objects.filter(category__icontains=category).all()
-                if not model == "select menu" and status == "select menu" and category == "select menu" and locationname == "select menu" and  shelf == "select":  #category &  model
-                    inv_list = Inventory.objects.filter(category__contains=category) & Inventory.objects.filter(modelname__contains=model).all()  
-                if not model == "select menu" and not status == "select menu" and category == "select menu" and locationname == "select menu" and  shelf == "select":  #category & status & model & description
-                    inv_list = Inventory.objects.filter(category__contains=category) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(description__contains=description).all()  
-                if not model == "select menu" and not status == "select menu" and not category == "select menu" and locationname == "select menu" and  shelf == "select": #category & status & model & description
-                    inv_list = Inventory.objects.filter(category__contains=category) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(status__contains=status).all() 
-                if not model == "select menu" and not status == "select menu" and not category == "select menu" and not locationname == "select menu" and  shelf == "select": #category & status & model & description &  cat
-                    inv_list = Inventory.objects.filter(category__contains=category) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(status__contains=status) & Inventory.objects.filter(locationname__contains=locationname).all() 
-                if not model == "select menu" and not status == "select menu" and not category == "select menu" and not locationname == "select menu" and not shelf == "select": #category &  status &  model & description &  cat'shelf
-                    inv_list = Inventory.objects.filter(category__contains=category) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(status__contains=status) & Inventory.objects.filter(locationname__contains=locationname) & Inventory.objects.filter(shelf__contains=shelf).all()     
+                    inv_list = Inventory.objects.filter(status__contains=status, modelname__contains=model).all()  
+                if not model == "select menu" and not status == "select menu" and not category == "select menu" and locationname == "select menu" and  shelf == "select":  #status & description
+                    inv_list = Inventory.objects.filter(status__contains=status, modelname__contains=model,category=category).all()       
+                if not model == "select menu" and not status == "select menu" and not category == "select menu" and not locationname == "select menu" and  shelf == "select":  #status & model & description
+                    inv_list = Inventory.objects.filter(status__contains=status, modelname__contains=model,category=category, locationname__icontains=locationname).all()   
+                if not model == "select menu" and not status == "select menu" and not category == "select menu" and not locationname == "select menu" and  shelf == "select": #status & model & description &  cat
+                    inv_list = Inventory.objects.filter(status__contains=status, modelname__contains=model,category=category, locationname__icontains=locationname).all()   
+                if not model == "select menu" and not status == "select menu" and not category == "select menu" and not locationname == "select menu" and not shelf == "select": #status & model & description &  cat' loc
+                    inv_list = Inventory.objects.filter(status__contains=status, modelname__contains=model,category=category, locationname__icontains=locationname, shelf__contains=shelf).all()   
+                if not model == "select menu" and not status == "select menu" and not category == "select menu" and not locationname == "select menu" and not shelf == "select" and not description  == "select menu" : #status &  model & description &  cat' loc &  shelf
+                    inv_list = Inventory.objects.filter(status__contains=status, modelname__contains=model,category=category, locationname__icontains=locationname, shelf__contains=shelf, description__icontains=description).all()       
             elif not locationname =="select menu": 
                 if description == "select menu" and model == "select menu" and status == "select menu" and category == "select menu" and  shelf == "select":#locationname only 
                     inv_list = Inventory.objects.filter(locationname__contains= locationname).all()
                 if not model == "select menu" and status == "select menu" and category == "select menu" and category == "select menu" and  shelf == "select":  #locationname &  model
-                    inv_list = Inventory.objects.filter(locationname__contains=locationname) & Inventory.objects.filter(modelname__contains=model).all()  
+                    inv_list = Inventory.objects.filter(locationname__contains=locationname, modelname__contains=model).all()  
                 if not model == "select menu" and not status == "select menu" and category == "select menu" and category == "select menu" and  shelf == "select":  #locationname & status & model & description
-                    inv_list = Inventory.objects.filter(locationname__contains=locationname) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(description__contains=description).all()  
+                    inv_list = Inventory.objects.filter(locationname__contains=locationname, modelname__contains=model,description__contains=description).all()  
                 if not model == "select menu" and not status == "select menu" and not category == "select menu" and category == "select menu" and  shelf == "select": #locationname & status & model & description &  cat
-                    inv_list = Inventory.objects.filter(locationname__contains=locationname) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(status__contain =status).all() 
+                    inv_list = Inventory.objects.filter(locationname__contains=locationname,modelname__contains=model, description__contains=description, status__contain=status).all() 
                 if not model == "select menu" and not status == "select menu" and not locationname == "select menu" and not category == "select menu" and  shelf == "select": #locationname & status & model & description &  cat
-                    inv_list = Inventory.objects.filter(locationname__contains=locationname) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(status__contains=status) & Inventory.objects.filter(category__contains=category).all() 
+                    inv_list = Inventory.objects.filter(locationname__contains=locationname, modelname__contains=model, description__contains=description, status__contains=status, category=category).all() 
                 if not model == "select menu" and not status == "select menu" and not category == "select menu" and not category == "select menu" and not shelf == "select": #locationname & status &  model & description &  cat &  shelf
-                    inv_list = Inventory.objects.filter(locationname__contains=locationname) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(status__contains=status) & Inventory.objects.filter(category__contains=category) & Inventory.objects.filter(shelf__contains=shelf).all()     
+                    inv_list = Inventory.objects.filter(locationname__contains=locationname, modelname__contains=model, description__contains=description, status__contains=status, category=category, shelf__contains=shelf).all()     
             elif not shelf =="select": 
                 if description == "select menu" and model == "select menu" and status == "select menu" and category == "select menu" and  locationname == "select menu":#locationname only 
                     inv_list = Inventory.objects.filter(shelf__contains=shelf).all()
                 if not model == "select menu" and not status == "select menu" and category == "select menu" and category == "select menu" and locationname == "select menu":  #locationname &  model
-                    inv_list = Inventory.objects.filter(shelf__contains=shelf) & Inventory.objects.filter(modelname__contains=model).all()  
+                    inv_list = Inventory.objects.filter(shelf__contains=shelf, modelname__contains=model).all()  
                 if not model == "select menu" and not status == "select menu" and category == "select menu" and category == "select menu" and locationname == "select menu":  #locationname & status & model & description
-                    inv_list = Inventory.objects.filter(shelf__contains=shelf) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(description__contains=description).all()  
+                    inv_list = Inventory.objects.filter(shelf__contains=shelf, modelname__contains=model, description__contains=description).all()  
                 if not model == "select menu" and not status == "select menu" and not category == "select menu" and category == "select menu" and locationname == "select menu": #locationname & status & model & description &  cat
-                    inv_list = Inventory.objects.filter(shelf__contains=shelf) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(status__contains=status).all() 
+                    inv_list = Inventory.objects.filter(shelf__contains=shelf, modelname__contains=model, description__contains=description, status__contains=status).all() 
                 if not model == "select menu" and not status == "select menu" and not locationname == "select menu" and not category == "select menu" and locationname == "select menu": #locationname & status & model & description &  cat
-                    inv_list = Inventory.objects.filter(shelf__contains=shelf) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(status__contains=status) & Inventory.objects.filter(category__contains=category).all() 
+                    inv_list = Inventory.objects.filter(shelf__contains=shelf, modelname__contains=model, description__contains=description, status__contains=status, category=category).all() 
                 if not model == "select menu" and not status == "select menu" and not category == "select menu" and not category == "select menu" and locationname == "select menu": #locationname & status &  model & description &  cat &  shelf
-                    inv_list = Inventory.objects.filter(shelf__contains=shelf) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(description__contains=desc) & Inventory.objects.filter(status__contains=status) & Inventory.objects.filter(category__contains=category) & Inventory.objects.filter(locationname__contains=locationname).all()     
+                    inv_list = Inventory.objects.filter(shelf__contains=shelf, modelname__contains=model, description__contains=desc, status__contains=status, category=category, locationname__contains=locationname).all()     
+            elif not description =="select menu": 
+                if model == "select menu" and status == "select menu" and category == "select menu" and locationname == "select menu" and  shelf == "select": #All
+                    inv_list = Inventory.objects.filter(description__contains=description).all()
+                if not model == "select menu" and status == "select menu" and category == "select menu" and locationname == "select menu" and  shelf == "select":  #description, model 
+                    inv_list = Inventory.objects.filter(description__contains=description, modelname__contains=model).all()  
+                if model == "select menu" and not status == "select menu" and category == "select menu" and locationname == "select menu" and  shelf == "select":  #description&status 
+                    inv_list = Inventory.objects.filter(description__contains=description, modelname__contains=model, status__contains=status).all()  
+                if not model == "select menu" and not status == "select menu" and not category == "select menu" and locationname == "select menu" and  shelf == "select": #description &  model, status, cat
+                    inv_list = Inventory.objects.filter(description__contains=description, modelname__contains=model, status__contains=status,ategory__contains=category).all() 
+                if not model == "select menu" and not status == "select menu" and not category == "select menu" and not locationname == "select menu" and  shelf == "select": #description, model, status, cat' loc
+                    inv_list = Inventory.objects.filter(description__contains=description, modelname__contains=model, status__contains=status, category=category, locationname__contains=locationname).all() 
+                if not model == "select menu" and not status == "select menu" and not category == "select menu" and not locationname == "select menu" and not shelf == "select": #description &  model &  status &  cat' loc &  shelf
+                    inv_list = Inventory.objects.filter(description__contains=description, modelname__contains=model, status__contains=status, category=category, locationname__contains=locationname, shelf__contains=shelf).all()     
             else:
                 inv_list ==None
         except IOError as e:
@@ -588,9 +590,9 @@ def report(request):
     event_list = []
     event = 'n/a'
     uploaded_file_url = ""
+    operator = str(request.user)
     #Get locationname
     try:
-       
         inventory_id = request.GET.get('inventory_id', -1)
         print('inventory_id = ',inventory_id)
         active_inv = Inventory.objects.filter(id=inventory_id)
@@ -623,151 +625,68 @@ def report(request):
                     
 
 def inv_report(request):
-    locations_list = []
-    shelves_list = []
-    event_list = []
-    event = 'n/a'
-    uploaded_file_url = ""
+    inv_list = []
+    models_list = []
+    model_list = []
+    curr_quan = []
+    field_quan = []
+    repair_quan = []
+    missing_quan = []
     #Get locationname
-    try:
-        print("in POST")
-        json_data = []
-        inv_list = []
-        inv = []
-        form = self.form_class()
-        print('request =',request)
-        model = request.POST.get('_model', -1)
-        print('model = ',model)
-        description = request.POST.get('_desc', -1)
-        print('description = ',description)
-        status = request.POST.get('_status', -1)
-        print('status =',status)
-        category = request.POST.get('_category', -1)
-        print('category =',category)
-        locationname = request.POST.get('_site', -1)
-        print('locationname =',locationname)
-        shelf = request.POST.get('_shelf', -1)
-        print('shelf =',shelf)
-        select = request.POST.get('sel', -1)
-        print('select =',select)
-        search = request.POST.get('search', -1)
-        print('search =',search)
-        success = True
-        x=0
-        y=0
-
-        desc_list = Model.objects.order_by('description').values_list('description', flat=True).distinct()
-        models_list = Model.objects.order_by('model').values_list('model', flat=True).distinct()
-        locations_list = Location.objects.order_by('name').values_list('name', flat=True).distinct()
-        shelves_list = Location.objects.order_by('shelf').values_list('shelf', flat=True).distinct()
-        if not search ==-1:
-            inv_list = Inventory.objects.filter(description__icontains=search) | Inventory.objects.filter(modelname__icontains=search) | Inventory.objects.filter(status__icontains=search) | Inventory.objects.filter(category__icontains=search) | Inventory.objects.filter(locationname__icontains=search) | Inventory.objects.filter(serial_number__contains=search) | Inventory.objects.filter(shelf__icontains=search).all()
-        elif description == "select menu" and model == "select menu" and status == "select menu" and category == "select menu" and locationname == "select menu" and  shelf == "select":
-            inv_list = Inventory.objects.all()
-        elif not description =="select menu": 
-            print('description selected')
-            if model == "select menu" and status == "select menu" and category == "select menu" and locationname == "select menu" and  shelf == "select": #All
-                inv_list = Inventory.objects.filter(description__contains=description).all()
-            if not model == "select menu" and status == "select menu" and category == "select menu" and locationname == "select menu" and  shelf == "select":  #description, model 
-                inv_list = Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(modelname__contains=model).all()  
-            if model == "select menu" and not status == "select menu" and category == "select menu" and locationname == "select menu" and  shelf == "select":  #description&status 
-                inv_list = Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(status__contains=status).all()  
-            if not model == "select menu" and not status == "select menu" and category == "select menu" and locationname == "select menu" and  shelf == "select":  #description& model &  status 
-                inv_list = Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(status__contains=status).all()  
-            if not model == "select menu" and not status == "select menu" and not category == "select menu" and locationname == "select menu" and  shelf == "select": #description &  model, status, cat
-                inv_list = Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(status__contains=status) & Inventory.objects.filter(category__contains=category).all() 
-            if not model == "select menu" and not status == "select menu" and not category == "select menu" and not locationname == "select menu" and  shelf == "select": #description, model, status, cat' loc
-                inv_list = Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(status__contains=status) & Inventory.objects.filter(category__contains=category) & Inventory.objects.filter(locationname__contains=locationname).all() 
-            if not model == "select menu" and not status == "select menu" and not category == "select menu" and not locationname == "select menu" and not shelf == "select": #description &  model &  status &  cat' loc &  shelf
-                inv_list = Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(status__contains=status) & Inventory.objects.filter(category__contains=category) & Inventory.objects.filter(locationname__contains=locationname) & Inventory.objects.filter(shelf__contains=shelf).all()     
-        elif not model =="select menu": 
-            if description == "select menu" and status == "select menu" and category == "select menu" and locationname == "select menu" and  shelf == "select":#model only 
-                inv_list == Inventory.objects.filter(modelname__contains=model).all()
-            if not model == "select menu" and status == "select menu" and category == "select menu" and locationname == "select menu" and  shelf == "select":  #model & description 
-                inv_list = Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(modelname__contains=model).all()  
-            if not model == "select menu" and not status == "select menu" and category == "select menu" and locationname == "select menu" and  shelf == "select":  #model & description &  status 
-                inv_list = Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(status__contains=status).all()  
-            if not model == "select menu" and not status == "select menu" and category == "select menu" and locationname == "select menu" and  shelf == "select":  #model &  status 
-                inv_list = Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(status__contains=status).all()  
-            if not model == "select menu" and not status == "select menu" and not category == "select menu" and locationname == "select menu" and  shelf == "select": #model & description &   status &  cat
-                inv_list = Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(status__contains=status) & Inventory.objects.filter(category__contains=category).all() 
-            if not model == "select menu" and not status == "select menu" and not category == "select menu" and not locationname == "select menu" and  shelf == "select": #model & description &  status &  cat' loc
-                inv_list = Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(status__contains=status) & Inventory.objects.filter(category__contains=category) & Inventory.objects.filter(locationname__contains=locationname).all() 
-            if not model == "select menu" and not status == "select menu" and not category == "select menu" and not locationname == "select menu" and not shelf == "select": #model & description &  status &  cat' loc &  shelf
-                inv_list = Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(status__contains=status) & Inventory.objects.filter(category__contains=category) & Inventory.objects.filter(locationname__contains=locationname) & Inventory.objects.filter(shelf__contains=shelf).all()     
-        elif not status =="select menu": 
-            if description == "select menu" and model == "select menu" and category == "select menu" and locationname == "select menu" and  shelf == "select":#status only 
-                inv_list = Inventory.objects.filter(status__contains=status).all()
-            if not model == "select menu" and not status == "select menu" and category == "select menu" and locationname == "select menu" and  shelf == "select":  #status &  model
-                inv_list = Inventory.objects.filter(status__contains=status) & Inventory.objects.filter(modelname__contains=model).all()  
-            if not model == "select menu" and not status == "select menu" and category == "select menu" and locationname == "select menu" and  shelf == "select":  #status & description
-                inv_list = Inventory.objects.filter(status__contains=status) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(description__contains=description).all()      
-            if not model == "select menu" and not status == "select menu" and category == "select menu" and locationname == "select menu" and  shelf == "select":  #status & model & description
-                inv_list = Inventory.objects.filter(status__contains=status) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(description__contains=description).all()  
-            if not model == "select menu" and not status == "select menu" and not category == "select menu" and locationname == "select menu" and  shelf == "select": #status & model & description &  cat
-                inv_list = Inventory.objects.filter(status__contains=status) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(category__contains=category).all() 
-            if not model == "select menu" and not status == "select menu" and not category == "select menu" and not locationname == "select menu" and  shelf == "select": #status & model & description &  cat' loc
-                inv_list = Inventory.objects.filter(status__contains=status) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(category__contains=category) & Inventory.objects.filter(locationname__contains=locationname).all() 
-            if not model == "select menu" and not status == "select menu" and not category == "select menu" and not locationname == "select menu" and not shelf == "select": #status &  model & description &  cat' loc &  shelf
-                inv_list = Inventory.objects.filter(status__contains=status) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(category__contains=category) & Inventory.objects.filter(locationname__contains=locationname) & Inventory.objects.filter(shelf__contains=shelf).all()     
-        elif not category =="select menu": 
-            if description == "select menu" and model == "select menu" and status == "select menu" and locationname == "select menu" and  shelf == "select":#category only 
-                inv_list = Inventory.objects.filter(category__contains=category).all()
-            if not model == "select menu" and status == "select menu" and category == "select menu" and locationname == "select menu" and  shelf == "select":  #category &  model
-                inv_list = Inventory.objects.filter(category__contains=category) & Inventory.objects.filter(modelname__contains=model).all()  
-            if not model == "select menu" and not status == "select menu" and category == "select menu" and locationname == "select menu" and  shelf == "select":  #category & status & model & description
-                inv_list = Inventory.objects.filter(category__contains=category) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(description__contains=description).all()  
-            if not model == "select menu" and not status == "select menu" and not category == "select menu" and locationname == "select menu" and  shelf == "select": #category & status & model & description
-                inv_list = Inventory.objects.filter(category__contains=category) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(status__contains=status).all() 
-            if not model == "select menu" and not status == "select menu" and not category == "select menu" and not locationname == "select menu" and  shelf == "select": #category & status & model & description &  cat
-                inv_list = Inventory.objects.filter(category__contains=category) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(status__contains=status) & Inventory.objects.filter(locationname__contains=locationname).all() 
-            if not model == "select menu" and not status == "select menu" and not category == "select menu" and not locationname == "select menu" and not shelf == "select": #category &  status &  model & description &  cat'shelf
-                inv_list = Inventory.objects.filter(category__contains=category) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(status__contains=status) & Inventory.objects.filter(locationname__contains=locationname) & Inventory.objects.filter(shelf__contains=shelf).all()     
-        elif not locationname =="select menu": 
-            if description == "select menu" and model == "select menu" and status == "select menu" and category == "select menu" and  shelf == "select":#locationname only 
-                inv_list = Inventory.objects.filter(locationname__contains= locationname).all()
-            if not model == "select menu" and status == "select menu" and category == "select menu" and category == "select menu" and  shelf == "select":  #locationname &  model
-                inv_list = Inventory.objects.filter(locationname__contains=locationname) & Inventory.objects.filter(modelname__contains=model).all()  
-            if not model == "select menu" and not status == "select menu" and category == "select menu" and category == "select menu" and  shelf == "select":  #locationname & status & model & description
-                inv_list = Inventory.objects.filter(locationname__contains=locationname) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(description__contains=description).all()  
-            if not model == "select menu" and not status == "select menu" and not category == "select menu" and category == "select menu" and  shelf == "select": #locationname & status & model & description &  cat
-                inv_list = Inventory.objects.filter(locationname__contains=locationname) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(status__contain =status).all() 
-            if not model == "select menu" and not status == "select menu" and not locationname == "select menu" and not category == "select menu" and  shelf == "select": #locationname & status & model & description &  cat
-                inv_list = Inventory.objects.filter(locationname__contains=locationname) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(status__contains=status) & Inventory.objects.filter(category__contains=category).all() 
-            if not model == "select menu" and not status == "select menu" and not category == "select menu" and not category == "select menu" and not shelf == "select": #locationname & status &  model & description &  cat &  shelf
-                inv_list = Inventory.objects.filter(locationname__contains=locationname) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(status__contains=status) & Inventory.objects.filter(category__contains=category) & Inventory.objects.filter(shelf__contains=shelf).all()     
-        elif not shelf =="select": 
-            if description == "select menu" and model == "select menu" and status == "select menu" and category == "select menu" and  locationname == "select menu":#locationname only 
-                inv_list = Inventory.objects.filter(shelf__contains=shelf).all()
-            if not model == "select menu" and not status == "select menu" and category == "select menu" and category == "select menu" and locationname == "select menu":  #locationname &  model
-                inv_list = Inventory.objects.filter(shelf__contains=shelf) & Inventory.objects.filter(modelname__contains=model).all()  
-            if not model == "select menu" and not status == "select menu" and category == "select menu" and category == "select menu" and locationname == "select menu":  #locationname & status & model & description
-                inv_list = Inventory.objects.filter(shelf__contains=shelf) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(description__contains=description).all()  
-            if not model == "select menu" and not status == "select menu" and not category == "select menu" and category == "select menu" and locationname == "select menu": #locationname & status & model & description &  cat
-                inv_list = Inventory.objects.filter(shelf__contains=shelf) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(status__contains=status).all() 
-            if not model == "select menu" and not status == "select menu" and not locationname == "select menu" and not category == "select menu" and locationname == "select menu": #locationname & status & model & description &  cat
-                inv_list = Inventory.objects.filter(shelf__contains=shelf) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(description__contains=description) & Inventory.objects.filter(status__contains=status) & Inventory.objects.filter(category__contains=category).all() 
-            if not model == "select menu" and not status == "select menu" and not category == "select menu" and not category == "select menu" and locationname == "select menu": #locationname & status &  model & description &  cat &  shelf
-                inv_list = Inventory.objects.filter(shelf__contains=shelf) & Inventory.objects.filter(modelname__contains=model) & Inventory.objects.filter(description__contains=desc) & Inventory.objects.filter(status__contains=status) & Inventory.objects.filter(category__contains=category) & Inventory.objects.filter(locationname__contains=locationname).all()     
-        else:
-            inv_list ==None
-    except IOError as e:
-        inv_list = None
-        print ("Lists load Failure ", e)
-        print('search =',search)
+    json_data = []
+    inv_list = []
+    inv = []
+    
+    operator = str(request.user)
+    model = request.GET.get('model', -1)
+    print('model = ',model)
+    category = request.GET.get('category', -1)
+    print('category = ',category)
+    success = True
+    if category =='select menu' and model =='select menu' :
+        inv_list = Inventory.objects.all()
+        model_list = Inventory.objects.order_by('modelname').values_list('modelname', flat=True).distinct()
+        category ='All categorys'
+    elif not category =='select menu' and model =='select menu' :
+        inv_list = Inventory.objects.filter(category=category).all()
+        model_list = Inventory.objects.filter(category=category).order_by('modelname').values_list('modelname', flat=True).distinct()
+    elif not category =='select menu' and not model =='select menu' :
+        inv_list = Inventory.objects.filter(category=category,modelname=model).all()
+        model_list = Inventory.objects.filter(category=category,modelname=model).order_by('modelname').values_list('modelname', flat=True).distinct()
+    
+    model_lists = []
+    lists =[]
+    for model in model_list:
+        total_quan=Inventory.objects.filter(modelname=model).count()
+        house_quan=Inventory.objects.filter(modelname=model).filter(status__icontains='In-House').count()
+        field_quan=Inventory.objects.filter(modelname=model).filter(status__icontains='On-Site').count()
+        repair_quan=Inventory.objects.filter(modelname=model).filter(status__icontains='In-Repair').count()
+        missing_quan=Inventory.objects.filter(modelname=model).filter(status__icontains='In-Repair').count()
+        list = {'modelname':model,'total_quan': total_quan, 'house_quan':house_quan,'field_quan':field_quan,'repair_quan':repair_quan,'missing_quan':missing_quan}
+        lists = json.dumps(list)  
+        model_lists.append(lists)
+        lists =[]
         
-    if not category ==-1:
-        models_list = Equipment.objects.filter(category=category).order_by('category').values_list('category', flat=True).distinct()
-        for model in models_list:
-            curr_quan[x]=Inventory.objects.filter(modelname=model).filter(status__icontains='In-House').count()
-            field_quan[x]=Inventory.objects.filter(modelname=model).filter(status__icontains='On-Site').count()
-            repair_quan[x]=Inventory.objects.filter(modelname=model).filter(status__icontains='In-Repair').count()
-            missing_quan[x]=Inventory.objects.filter(modelname=model).filter(status__icontains='In-Repair').count()
-            x=+1
+      
+    print('name=',model_lists[0])
+    desc_list = Model.objects.order_by('description').values_list('description', flat=True).distinct()
+    locations_list = Location.objects.order_by('name').values_list('name', flat=True).distinct()
+    shelves_list = Location.objects.order_by('shelf').values_list('shelf', flat=True).distinct()
+    
         
-    return render (request,"inventory/inv_report.html",{"inv_list":inv_list, "cat_list":cat_list,"curr_quan":curr_quan,"field_quan":field_quan, 
-                    "repair_quan":repair_quan, "missing_quan":missing_quan, "today":date.today(),'event':event,'active_operator':operator})
+   
+    return render (request,"inventory/inv_report.html",{"inv_list":inv_list, "category":category, "models_list":model_list, "curr_quan":curr_quan, "field_quan":field_quan, 
+                    "repair_quan":repair_quan, "missing_quan":missing_quan, "today":date.today(),'active_operator':operator})
 					
+
+
+def to_json(lst,columns):
+    keys = []
+    for d in lst:
+       keys.append((columns,d))
+    data = json.dumps(keys)
+    return data
+    
 #https://flask.palletsprojects.com/en/1.1.x/patterns/fileuploads/ 
 def upload_file(request):
     if request.method == 'POST':
