@@ -172,9 +172,10 @@
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-sm-1 col-lg-1 grid-col">
+				<div class="col-sm-2 col-lg-4 grid-col">
 					<div class="form-group">
-						<a class="nav-link" href="{% url 'inventory:inv_report' %}?category={{category}}&model={{model}}" >Monthly Report</a>
+						<a class="report-link" href="{% url 'inventory:inv_report' %}?category={{category}}&model={{model}}" >Monthly Report</a>
+						<a class="report-link-info" >   (Select a category first. For a single model report, select a Model)</a>
 					</div>
 				</div>
 			</div>
