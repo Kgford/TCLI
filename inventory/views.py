@@ -668,11 +668,6 @@ def inv_report(request):
         model_lists = ListAsQuerySet(model_lists, model='Post')
         
       
-    print('name=',model_lists[10])
-    print('total_quan=',model_lists[10])
-    print('house_quan=',model_lists[10])
-    print('field_quan=',model_lists[10])
-    print('missing_quan',model_lists[10])
     desc_list = Model.objects.order_by('description').values_list('description', flat=True).distinct()
     locations_list = Location.objects.order_by('name').values_list('name', flat=True).distinct()
     shelves_list = Location.objects.order_by('shelf').values_list('shelf', flat=True).distinct()
