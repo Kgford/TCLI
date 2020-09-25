@@ -1,6 +1,9 @@
 from django.db import models
 from django.core.files.base import ContentFile
 from django.utils import timezone
+from django.conf import settings
+# info on remote/local storage
+#https://docs.djangoproject.com/en/dev/topics/files/
 
 
 
@@ -18,8 +21,8 @@ class Model(models.Model):
     status = models.CharField("status",max_length=50,null=True,unique=False) 
     last_update = models.DateField(default=timestamp)
     inventory_id = models.IntegerField(null=True,unique=False)
-    photo= models.ImageField(upload_to='Images/', blank=True)
-    
+    photo= models.ImageField(upload_to='media/', blank=True)
+        
     def __str__(self):
         return self.description
         

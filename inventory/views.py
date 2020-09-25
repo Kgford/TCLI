@@ -27,8 +27,7 @@ class InventoryView(View):
 
     contSuccess = 0
     # Remove all data from Table
-
-    Inventory.objects.all().delete()
+    #Inventory.objects.all().delete()
     f = open(CSV_PATH)
     reader = csv.reader(f)
     print('reader = ',reader)
@@ -38,7 +37,7 @@ class InventoryView(View):
          status=status, remarks=remarks, last_update=datetime.datetime.strptime(last_update, '%m/%d/%Y'), update_by=update_by)
         contSuccess += 1
     print(f'{str(contSuccess)} inserted successfully! ') 
-    ''' 
+    '''
     '''
     #~~~~~~~~~~~Load Events database from csv. must put this somewhere else later"
     import csv
@@ -63,7 +62,6 @@ class InventoryView(View):
     #~~~~~~~~~~~Load Events database from csv. must put this somewhere else later"   
     '''
     '''
-    #~~~~~~~~~~~Load location database from csv. must put this somewhere else later"
     import csv
     timestamp  = date.today()
     CSV_PATH = 'locations.csv'
@@ -663,11 +661,12 @@ def inv_report(request):
         repair_quan=Inventory.objects.filter(modelname=model).filter(status__icontains='In-Repair').count()
         missing_quan=Inventory.objects.filter(modelname=model).filter(status__icontains='In-Repair').count()
         list = {'modelname':model,'total_quan': total_quan, 'house_quan':house_quan,'field_quan':field_quan,'repair_quan':repair_quan,'missing_quan':missing_quan}
-        lists = json.dumps(list)  
+        lists = json.dumps(list)
         model_lists.append(lists)
         model_lists = ListAsQuerySet(model_lists, model='Post')
-        
-      
+    
+    print('model_list = ', model_lists) 
+    print('inv_list = ',inv_list)
     desc_list = Model.objects.order_by('description').values_list('description', flat=True).distinct()
     locations_list = Location.objects.order_by('name').values_list('name', flat=True).distinct()
     shelves_list = Location.objects.order_by('shelf').values_list('shelf', flat=True).distinct()

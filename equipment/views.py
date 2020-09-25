@@ -14,15 +14,14 @@ from django.conf.urls import url
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.files.storage import FileSystemStorage
+import datetime
 model_id = 0
 
 class EquipmentView(View):
     form_class = EquipmentForm
     template_name = "index.html"
     success_url = reverse_lazy('equipment:equipment')
-    
     contSuccess = 0
-    
     
     def get(self, *args, **kwargs):
         form = self.form_class()

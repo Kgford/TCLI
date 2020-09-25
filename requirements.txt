@@ -7,4 +7,5 @@ whitenoise
 django-contrib-comments
 Pillow
 django-session-timeout
+django-storages
 

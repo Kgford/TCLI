@@ -3,7 +3,7 @@
 <HTML>
 <HEAD>
 	<meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1255" /> 
-	<link rel="icon" type="image/x-icon" href="{% static 'users/images/rings_16x16.ico' %}">
+	<link rel="icon" type="image/x-icon" href="{% static 'inventory/images/rings_16x16.ico' %}">
 	<meta name="TCLI Inventory Management" content="">
 	<script
 	  src="https://code.jquery.com/jquery-2.2.4.min.js"
@@ -48,9 +48,9 @@ img {
 }
 
 </style>
-<link rel="stylesheet" href="{% static 'users/css/styles.css"' %}">
+<link rel="stylesheet" href="{% static 'inventory/css/styles.css' %}">
 <div class="center">
-	<img src="{% static 'users/images/logo.png' %}" class="center"; "max-width: 100%;" height auto" ;alt="Responsive image">
+	<img src="{% static 'inventory/images/logo.png' %}" class="center"; "max-width: 100%;" height auto" ;alt="Responsive image">
 	<p></p>
 	<p></p>
 	<p></p>
@@ -95,7 +95,7 @@ img {
 		<TR height="20" ><TD NOWRAP="True" class="STR0"> {{item.category}} </TD><TD NOWRAP="True" class="STR0"> {{item.status}}</TD><TD NOWRAP="" class="STR0"> {{item.modelname}} </TD><TD NOWRAP="" class="STR0"> {{item.serial_number}}</TD><TD NOWRAP="" class="STR0"> {{item.locationname}} </TD><TD NOWRAP="" class="STR0"> {{item.description}} </TD></TR>
 	{% endfor %}
 </TBODY></TABLE>
-
+<script type="text/javascript" src="{% static 'inventory/js/load_report.js' %}"></script>
 
 
 </BODY></HTML>
