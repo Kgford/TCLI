@@ -70,7 +70,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django_session_timeout.middleware.SessionTimeoutMiddleware',
@@ -108,11 +108,35 @@ WSGI_APPLICATION = 'tcli.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.sqlite3',
+#       'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#    }
+#}
+
 DATABASES = {
+
     'default': {
+
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+
+        'NAME': 'd6uhhlj1det7tf',
+
+        'USER': 'xxlmdvsahhdege',
+
+        'PASSWORD': 'bd1ad361c326412ecb63d0aeed44dc8f581c33248efb62d1a6b15ce617b40725',
+
+        'HOST': 'ec2-52-206-15-227.compute-1.amazonaws.com',
+
+        'PORT': '5432',
+
+    },
+    'local': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+       'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
+
 }
 
 
